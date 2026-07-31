@@ -60,6 +60,21 @@ public sealed class PaymentsController : ControllerBase
         return Ok(payment);
     }
 
+    [HttpDelete("{id:guid}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public IActionResult Delete(Guid id)
+    {
+        var wasDeleted = _paymentRepository.Delete(id);
+
+        if (!wasDeleted)
+        {
+            return NotFound();
+        }
+
+        return NoContent();
+    }
+
     [HttpPost]
     [ProducesResponseType(typeof(Payment), StatusCodes.Status201Created)]
     public ActionResult<Payment> Create(CreatePaymentRequest request)

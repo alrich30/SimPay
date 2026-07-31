@@ -91,4 +91,29 @@ public sealed class InMemoryPaymentRepositoryTests
 
         Assert.Null(result);
     }
+
+    [Fact]
+    public void Delete_WithExistingId_ShouldRemovePayment()
+    {
+        var repository = new InMemoryPaymentRepository();
+        var payment = CreatePayment(1500m, "Pago para eliminar");
+
+        repository.Add(payment);
+
+        var wasDeleted = repository.Delete(payment.Id);
+        var deletedPayment = repository.GetById(payment.Id);
+
+        Assert.True(wasDeleted);
+        Assert.Null(deletedPayment);
+    }
+
+    [Fact]
+    public void Delete_WithUnknownId_ShouldReturnFalse()
+    {
+        var repository = new InMemoryPaymentRepository();
+
+        var wasDeleted = repository.Delete(Guid.NewGuid());
+
+        Assert.False(wasDeleted);
+    }
 }

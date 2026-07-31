@@ -52,4 +52,9 @@ public sealed class InMemoryPaymentRepository : IPaymentRepository
 
         return payment;
     }
+
+    public bool Delete(Guid id)
+    {
+        return _payments.TryRemove(id, out _);
+    }
 }
