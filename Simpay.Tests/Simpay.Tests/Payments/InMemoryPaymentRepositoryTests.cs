@@ -56,4 +56,39 @@ public sealed class InMemoryPaymentRepositoryTests
             "DOP",
             description);
     }
+
+    [Fact]
+    public void Update_WithExistingId_ShouldModifyPayment()
+    {
+        var repository = new InMemoryPaymentRepository();
+        var payment = CreatePayment(1500m, "Descripción original");
+
+        repository.Add(payment);
+
+        var updatedPayment = repository.Update(
+            payment.Id,
+            3250.75m,
+            "DOP",
+            "Pago actualizado");
+
+        Assert.NotNull(updatedPayment);
+        Assert.Equal(payment.Id, updatedPayment.Id);
+        Assert.Equal(3250.75m, updatedPayment.Amount);
+        Assert.Equal("DOP", updatedPayment.Currency);
+        Assert.Equal("Pago actualizado", updatedPayment.Description);
+    }
+
+    [Fact]
+    public void Update_WithUnknownId_ShouldReturnNull()
+    {
+        var repository = new InMemoryPaymentRepository();
+
+        var result = repository.Update(
+            Guid.NewGuid(),
+            3250.75m,
+            "DOP",
+            "Pago inexistente");
+
+        Assert.Null(result);
+    }
 }
