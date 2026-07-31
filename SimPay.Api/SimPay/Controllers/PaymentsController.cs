@@ -15,6 +15,30 @@ public sealed class PaymentsController : ControllerBase
         _paymentRepository = paymentRepository;
     }
 
+    [HttpGet]
+    [ProducesResponseType(typeof(IEnumerable<Payment>), StatusCodes.Status200OK)]
+    public ActionResult<IReadOnlyCollection<Payment>> GetAll()
+    {
+        var payments = _paymentRepository.GetAll();
+
+        return Ok(payments);
+    }
+
+    [HttpGet("{id:guid}")]
+    [ProducesResponseType(typeof(Payment), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public ActionResult<Payment> GetById(Guid id)
+    {
+        var payment = _paymentRepository.GetById(id);
+
+        if (payment is null)
+        {
+            return NotFound();
+        }
+
+        return Ok(payment);
+    }
+
     [HttpPost]
     [ProducesResponseType(typeof(Payment), StatusCodes.Status201Created)]
     public ActionResult<Payment> Create(CreatePaymentRequest request)
@@ -28,8 +52,11 @@ public sealed class PaymentsController : ControllerBase
 
         _paymentRepository.Add(payment);
 
-        return Created($"/api/payments/{payment.Id}", payment);
-    }
+        return CreatedAtAction(
+            nameof(GetById),
+            new { id = payment.Id },
+            payment);
+        }
 
 
 }
