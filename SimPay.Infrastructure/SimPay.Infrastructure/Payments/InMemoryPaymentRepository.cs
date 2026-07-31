@@ -20,4 +20,18 @@ public sealed class InMemoryPaymentRepository : IPaymentRepository
 
         return payment;
     }
+
+    public IReadOnlyCollection<Payment> GetAll()
+    {
+        return _payments.Values
+            .OrderByDescending(payment => payment.CreatedAtUtc)
+            .ToArray();
+    }
+
+    public Payment? GetById(Guid id)
+    {
+        _payments.TryGetValue(id, out var payment);
+
+        return payment;
+    }
 }
