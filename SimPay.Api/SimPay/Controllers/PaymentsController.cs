@@ -39,6 +39,27 @@ public sealed class PaymentsController : ControllerBase
         return Ok(payment);
     }
 
+    [HttpPut("{id:guid}")]
+    [ProducesResponseType(typeof(Payment), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public ActionResult<Payment> Update(
+    Guid id,
+    UpdatePaymentRequest request)
+    {
+        var payment = _paymentRepository.Update(
+            id,
+            request.Amount,
+            request.Currency,
+            request.Description);
+
+        if (payment is null)
+        {
+            return NotFound();
+        }
+
+        return Ok(payment);
+    }
+
     [HttpPost]
     [ProducesResponseType(typeof(Payment), StatusCodes.Status201Created)]
     public ActionResult<Payment> Create(CreatePaymentRequest request)

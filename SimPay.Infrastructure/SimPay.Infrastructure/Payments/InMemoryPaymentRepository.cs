@@ -34,4 +34,22 @@ public sealed class InMemoryPaymentRepository : IPaymentRepository
 
         return payment;
     }
+
+    public Payment? Update(
+    Guid id,
+    decimal amount,
+    string currency,
+    string? description)
+    {
+        var payment = GetById(id);
+
+        if (payment is null)
+        {
+            return null;
+        }
+
+        payment.UpdateDetails(amount, currency, description);
+
+        return payment;
+    }
 }
