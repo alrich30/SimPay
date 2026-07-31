@@ -7,4 +7,10 @@ public interface IPaymentRepository
     Payment Add(Payment payment);
     IReadOnlyCollection<Payment> GetAll();
     Payment? GetById(Guid id);
+
+    Payment? Update(
+    Guid id,
+    decimal amount,
+    string currency,
+    string? description);
 }

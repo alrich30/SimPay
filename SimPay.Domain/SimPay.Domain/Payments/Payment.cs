@@ -27,4 +27,14 @@ public sealed class Payment
         Status = PaymentStatus.Pending;
         CreatedAtUtc = DateTime.UtcNow;
     }
+
+    public void UpdateDetails(
+    decimal amount,
+    string currency,
+    string? description)
+    {
+        Amount = amount;
+        Currency = currency;
+        Description = description;
+    }
 }
