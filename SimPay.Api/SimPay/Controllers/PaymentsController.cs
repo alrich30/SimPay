@@ -41,6 +41,7 @@ public sealed class PaymentsController : ControllerBase
 
     [HttpPut("{id:guid}")]
     [ProducesResponseType(typeof(Payment), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public ActionResult<Payment> Update(
     Guid id,
@@ -49,7 +50,7 @@ public sealed class PaymentsController : ControllerBase
         var payment = _paymentRepository.Update(
             id,
             request.Amount,
-            request.Currency,
+            request.Currency.Trim().ToUpperInvariant(),
             request.Description);
 
         if (payment is null)
@@ -77,13 +78,38 @@ public sealed class PaymentsController : ControllerBase
 
     [HttpPost]
     [ProducesResponseType(typeof(Payment), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public ActionResult<Payment> Create(CreatePaymentRequest request)
     {
+        if (request.SourceAccountId == Guid.Empty)
+        {
+            return BadRequest(new
+            {
+                message = "La cuenta de origen es obligatoria."
+            });
+        }
+
+        if (request.DestinationAccountId == Guid.Empty)
+        {
+            return BadRequest(new
+            {
+                message = "La cuenta de destino es obligatoria."
+            });
+        }
+
+        if (request.SourceAccountId == request.DestinationAccountId)
+        {
+            return BadRequest(new
+            {
+                message = "Las cuentas de origen y destino deben ser diferentes."
+            });
+        }
+
         var payment = new Payment(
             request.SourceAccountId,
             request.DestinationAccountId,
             request.Amount,
-            request.Currency,
+            request.Currency.Trim().ToUpperInvariant(),
             request.Description);
 
         _paymentRepository.Add(payment);

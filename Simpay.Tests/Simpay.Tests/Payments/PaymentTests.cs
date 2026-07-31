@@ -29,4 +29,55 @@ public sealed class PaymentTests
         Assert.Equal(PaymentStatus.Pending, payment.Status);
         Assert.InRange(payment.CreatedAtUtc, beforeCreation, afterCreation);
     }
+
+    [Fact]
+    public void Create_WithSameAccountIds_ShouldThrowArgumentException()
+    {
+        var accountId = Guid.NewGuid();
+
+        Assert.Throws<ArgumentException>(() =>
+            new Payment(
+                accountId,
+                accountId,
+                1500m,
+                "DOP",
+                "Pago inválido"));
+    }
+
+    [Fact]
+    public void Create_WithNonPositiveAmount_ShouldThrowArgumentOutOfRangeException()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            new Payment(
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                -500m,
+                "DOP",
+                "Importe inválido"));
+    }
+
+    [Fact]
+    public void Create_WithInvalidCurrency_ShouldThrowArgumentException()
+    {
+        Assert.Throws<ArgumentException>(() =>
+            new Payment(
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                1500m,
+                "DO",
+                "Moneda inválida"));
+    }
+
+    [Fact]
+    public void Create_WithLowercaseCurrency_ShouldNormalizeCurrency()
+    {
+        var payment = new Payment(
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            1500m,
+            "dop",
+            "Pago válido");
+
+        Assert.Equal("DOP", payment.Currency);
+    }
 }
